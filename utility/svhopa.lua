@@ -28,6 +28,7 @@ local function resetUsedIDsIfHourChanged()
     local currentHour = os.date("!*t").hour
     if currentHour ~= lastHour then
         UsedIDs = {}
+		AllIDs = {}
         lastHour = currentHour
         saveData()
     end
