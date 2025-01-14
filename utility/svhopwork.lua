@@ -14,13 +14,13 @@ local function loadData()
         AllIDs = data.AllIDs or {}
         UsedIDs = data.UsedIDs or {}
     else
-        writefile("TestingExperimental.json", game:GetService('HttpService'):JSONEncode({AllIDs = {}, UsedIDs = {}}))
+        writefile("baa.json", game:GetService('HttpService'):JSONEncode({AllIDs = {}, UsedIDs = {}}))
     end
 end
 
 -- Save the updated IDs and timestamps
 local function saveData()
-    writefile("TestingExperimental.json", game:GetService('HttpService'):JSONEncode({AllIDs = AllIDs, UsedIDs = UsedIDs}))
+    writefile("baa.json", game:GetService('HttpService'):JSONEncode({AllIDs = AllIDs, UsedIDs = UsedIDs}))
 end
 
 -- Reset UsedIDs if the hour has changed
@@ -28,7 +28,6 @@ local function resetUsedIDsIfHourChanged()
     local currentHour = os.date("!*t").hour
     if currentHour ~= lastHour then
         UsedIDs = {}
-		AllIDs = {}
         lastHour = currentHour
         saveData()
     end
