@@ -3,5 +3,4 @@ return {
   743416428, --@keybinds
   3265018985, --@maddym4
   2914243596, --arabkeng
-  5181540130, --moneyperk
 }
