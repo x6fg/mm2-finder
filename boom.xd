@@ -108,6 +108,8 @@ local function TPReturner()
     local ID = table.remove(AllIDs, 1) -- Get the first ID from the list
     print("Attempting to teleport to server ID: " .. ID)
 
+    saveData()
+    task.wait(1)
     local success, err = pcall(function()
         game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
     end)
@@ -121,7 +123,6 @@ local function TPReturner()
     end
 
     -- Save the updated UsedIDs to the file after attempting to teleport
-    saveData()
 end
 
 -- Start the teleport process
