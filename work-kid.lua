@@ -1,9 +1,9 @@
+print("loaded")
 local PlaceID = game.PlaceId
 local AllIDs = {}
 local UsedIDs = {}
 local lastHour = os.date("!*t").hour
-local foundAnything = ""
-local serverFileName = "ServerIDs_" .. PlaceID .. ".json"  -- Updated to include PlaceID
+local serverFileName = "ServerIDs_" .. PlaceID .. ".json"  -- File name based on PlaceID
 
 -- Load the previously stored IDs and timestamps
 local function loadData()
@@ -12,7 +12,7 @@ local function loadData()
         return game:GetService('HttpService'):JSONDecode(readfile(serverFileName))
     end)
     
-    if success then
+    if success and data then
         AllIDs = data.AllIDs or {}
         UsedIDs = data.UsedIDs or {}
         print("Data loaded successfully. AllIDs count: " .. #AllIDs .. ", UsedIDs count: " .. #UsedIDs)
@@ -38,11 +38,6 @@ local function resetUsedIDsIfHourChanged()
         lastHour = currentHour
         saveData()
     end
-end
-
--- Function to determine if a server has been visited within the current hour
-local function isRecentVisit(ID)
-    return UsedIDs[ID] == true
 end
 
 -- Function to record a server visit
@@ -81,9 +76,7 @@ end
 local function Teleport()
     while wait(1) do -- Reduced wait time to 1 second for more frequent checks
         resetUsedIDsIfHourChanged()
-        pcall(function()
-            TPReturner()
-        end)
+        TPReturner() -- Directly call TPReturner without pcall for simplicity
     end
 end
 
