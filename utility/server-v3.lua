@@ -14,14 +14,17 @@ local function loadData()
     if success then
         AllIDs = data.AllIDs or {}
         UsedIDs = data.UsedIDs or {}
+        print("Data loaded successfully.")
     else
         writefile(serverFileName, game:GetService('HttpService'):JSONEncode({AllIDs = {}, UsedIDs = {}}))
+        print("No data found, created new file.")
     end
 end
 
 -- Save the updated IDs and timestamps
 local function saveData()
     writefile(serverFileName, game:GetService('HttpService'):JSONEncode({AllIDs = AllIDs, UsedIDs = UsedIDs}))
+    print("Data saved.")
 end
 
 -- Reset UsedIDs if the hour has changed
@@ -31,6 +34,7 @@ local function resetUsedIDsIfHourChanged()
         UsedIDs = {}
         lastHour = currentHour
         saveData()
+        print("Used IDs reset for the new hour.")
     end
 end
 
@@ -46,31 +50,46 @@ end
 
 -- Function to fetch new servers and update the AllIDs list
 local function fetchNewServers()
-    local Site
     local url = 'https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Desc&excludeFullGames=true&limit=100'
     
     if foundAnything ~= "" then
         url = url .. '&cursor=' .. foundAnything
     end
 
+    print("Fetching servers from URL: " .. url) -- Print the URL for debugging
+
     local success, response = pcall(function()
-        return game.HttpService:JSONDecode(game.HttpService:HttpGet(url))
+        return game.HttpService:JSONDecode(game:HttpGet(url))
     end)
 
-    if not success or not response.data then
+    if not success then
+        print("HTTP request failed: " .. response) -- Print the error message
         return -- Exit if the request fails
+    end
+
+    if not response.data then
+        print("No data returned from the server.")
+        return
     end
 
     if response.nextPageCursor and response.nextPageCursor ~= "null" then
         foundAnything = response.nextPageCursor
     end
 
+    local newIDs = {} -- Temporary table to hold new server IDs
+
     for _, v in pairs(response.data) do
         local ID = tostring(v.id)
-        if tonumber(v.maxPlayers) > tonumber(v.playing) and not isRecentVisit(ID) then
-            table.insert(AllIDs, ID)
-            recordVisit(ID)
+        if tonumber(v.maxPlayers) > tonumber(v.playing) and not isRecentVisit(ID) and not AllIDs[ID] then
+            table.insert(newIDs, ID) -- Add to temporary table
+            recordVisit(ID) -- Record the visit
+            print("Found new server ID: " .. ID)
         end
+    end
+
+    -- Add all new IDs to AllIDs at once
+    for _, id in ipairs(newIDs) do
+        table.insert(AllIDs, id)
     end
 
     -- Save the updated AllIDs to the file
@@ -80,13 +99,17 @@ end
 -- Attempt to teleport to a suitable server
 local function TPReturner()
     if #AllIDs == 0 then
+        print("AllIDs is empty, fetching new servers...")
         fetchNewServers()
     end
 
     if #AllIDs > 0 then
         local ID = table.remove(AllIDs, 1) -- Get the first ID from the list
+        print("Teleporting to server ID: " .. ID)
         game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
         wait(3) -- Wait for a short period before the next teleport
+    else
+        print("No suitable servers found.")
     end
 end
 
