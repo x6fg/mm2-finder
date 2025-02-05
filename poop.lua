@@ -1,8 +1,9 @@
-print("naa")
+print("duhh")
 local PlaceID = game.PlaceId
 local AllIDs = {}
 local UsedIDs = {}
 local lastHour = os.date("!*t").hour
+local foundAnything = ""
 local serverFileName = "ServerIDs_" .. PlaceID .. ".json"  -- File name based on PlaceID
 
 -- Load the previously stored IDs and timestamps
@@ -46,10 +47,63 @@ local function recordVisit(ID)
     print("Recorded visit for server ID: " .. ID)
 end
 
+-- Function to fetch new servers and update the AllIDs list
+local function fetchNewServers()
+    local url = 'https://games.roblox.com/v1/games/' .. PlaceID .. '/servers/Public?sortOrder=Desc&excludeFullGames=true&limit=100'
+    
+    if foundAnything ~= "" then
+        url = url .. '&cursor=' .. foundAnything
+    end
+
+    print("Fetching servers from URL: " .. url) -- Print the URL for debugging
+
+    local success, response = pcall(function()
+        return game.HttpService:JSONDecode(game:HttpGet(url))
+    end)
+
+    if not success then
+        print("HTTP request failed: " .. response) -- Print the error message
+        return -- Exit if the request fails
+    end
+
+    if not response.data then
+        print("No data returned from the server.")
+        return
+    end
+
+    if response.nextPageCursor and response.nextPageCursor ~= "null" then
+        foundAnything = response.nextPageCursor
+        print("Next page cursor found: " .. foundAnything)
+    end
+
+    local newIDs = {} -- Temporary table to hold new server IDs
+
+    for _, v in pairs(response.data) do
+        local ID = tostring(v.id)
+        if tonumber(v.maxPlayers) > tonumber(v.playing) and not UsedIDs[ID] and not AllIDs[ID] then
+            table.insert(newIDs, ID) -- Add to temporary table
+            print("Found new server ID: " .. ID)
+        end
+    end
+
+    -- Add all new IDs to AllIDs at once
+    for _, id in ipairs(newIDs) do
+        table.insert(AllIDs, id)
+    end
+
+    -- Save the updated AllIDs to the file if new IDs were found
+    if #newIDs > 0 then
+        saveData()
+    else
+        print("No new server IDs found.")
+    end
+end
+
 -- Attempt to teleport to a suitable server
 local function TPReturner()
     if #AllIDs == 0 then
-        print("AllIDs is empty. No servers to teleport to.")
+        print("AllIDs is empty. Fetching new servers...")
+        fetchNewServers() -- Fetch new servers if the list is empty
         return
     end
 
