@@ -101,15 +101,15 @@ local function TPReturner()
     if #AllIDs == 0 then
         print("AllIDs is empty, fetching new servers...")
         fetchNewServers()
-    end
-
-    if #AllIDs > 0 then
-        local ID = table.remove(AllIDs, 1) -- Get the first ID from the list
-        print("Teleporting to server ID: " .. ID)
-        game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
-        wait(3) -- Wait for a short period before the next teleport
     else
-        print("No suitable servers found.")
+
+        for i, v in pairs(AllIDs) do
+            local ID = table.remove(AllIDs, v) -- Get the first ID from the list
+            print("Teleporting to server ID: " .. ID)
+            game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
+            break
+        end
+        print("kakann")
     end
 end
 
