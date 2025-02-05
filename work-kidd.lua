@@ -1,4 +1,4 @@
-print("loaded")
+print("naa")
 local PlaceID = game.PlaceId
 local AllIDs = {}
 local UsedIDs = {}
@@ -55,7 +55,10 @@ local function TPReturner()
 
     local ID = table.remove(AllIDs, 1) -- Get the first ID from the list
     print("Attempting to teleport to server ID: " .. ID)
-    
+
+    -- Save the updated AllIDs to the file before attempting to teleport
+    saveData()
+
     local success, err = pcall(function()
         game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
     end)
@@ -67,16 +70,13 @@ local function TPReturner()
         print("Failed to teleport to server ID: " .. ID .. ". Error: " .. err)
         -- If teleportation fails, you might want to keep the ID in the list or handle it differently
     end
-
-    -- Save the updated AllIDs to the file after attempting to teleport
-    saveData()
 end
 
 -- Start the teleport process
 local function Teleport()
     while wait(1) do -- Reduced wait time to 1 second for more frequent checks
         resetUsedIDsIfHourChanged()
-        TPReturner() -- Directly call TPReturner without pcall for simplicity
+        TPReturner() -- Directly call TPReturner
     end
 end
 
