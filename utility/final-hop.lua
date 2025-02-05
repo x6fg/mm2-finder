@@ -3,11 +3,10 @@ local AllIDs = {}
 local UsedIDs = {}
 local lastHour = os.date("!*t").hour
 local foundAnything = ""
-local serverFileName = "ServerIDs_" .. PlaceID .. ".json"  -- Updated to include PlaceID
+local serverFileName = "Sbaba" .. PlaceID .. ".json"  -- File name based on PlaceID
 
 -- Load the previously stored IDs and timestamps
 local function loadData()
-    print("Loading data from file: " .. serverFileName)
     local success, data = pcall(function()
         return game:GetService('HttpService'):JSONDecode(readfile(serverFileName))
     end)
@@ -15,28 +14,27 @@ local function loadData()
     if success then
         AllIDs = data.AllIDs or {}
         UsedIDs = data.UsedIDs or {}
-        print("Data loaded successfully. AllIDs count: " .. #AllIDs .. ", UsedIDs count: " .. #UsedIDs)
+        print("Data loaded successfully.")
     else
         writefile(serverFileName, game:GetService('HttpService'):JSONEncode({AllIDs = {}, UsedIDs = {}}))
-        print("No data found, created new file: " .. serverFileName)
+        print("No data found, created new file.")
     end
 end
 
 -- Save the updated IDs and timestamps
 local function saveData()
-    print("Saving data to file: " .. serverFileName)
     writefile(serverFileName, game:GetService('HttpService'):JSONEncode({AllIDs = AllIDs, UsedIDs = UsedIDs}))
-    print("Data saved. AllIDs count: " .. #AllIDs .. ", UsedIDs count: " .. #UsedIDs)
+    print("Data saved.")
 end
 
 -- Reset UsedIDs if the hour has changed
 local function resetUsedIDsIfHourChanged()
     local currentHour = os.date("!*t").hour
     if currentHour ~= lastHour then
-        print("Hour changed from " .. lastHour .. " to " .. currentHour .. ". Resetting UsedIDs.")
         UsedIDs = {}
         lastHour = currentHour
         saveData()
+        print("Used IDs reset for the new hour.")
     end
 end
 
@@ -77,7 +75,6 @@ local function fetchNewServers()
 
     if response.nextPageCursor and response.nextPageCursor ~= "null" then
         foundAnything = response.nextPageCursor
-        print("Next page cursor found: " .. foundAnything)
     end
 
     local newIDs = {} -- Temporary table to hold new server IDs
@@ -86,7 +83,6 @@ local function fetchNewServers()
         local ID = tostring(v.id)
         if tonumber(v.maxPlayers) > tonumber(v.playing) and not isRecentVisit(ID) and not AllIDs[ID] then
             table.insert(newIDs, ID) -- Add to temporary table
-            recordVisit(ID) -- Record the visit
             print("Found new server ID: " .. ID)
         end
     end
@@ -97,12 +93,7 @@ local function fetchNewServers()
     end
 
     -- Save the updated AllIDs to the file
-    if #newIDs > 0 then
-        print("Total new server IDs found: " .. #newIDs)
-        saveData()
-    else
-        print("No new server IDs found.")
-    end
+    saveData()
 end
 
 -- Attempt to teleport to a suitable server
@@ -110,25 +101,33 @@ local function TPReturner()
     if #AllIDs == 0 then
         print("AllIDs is empty, fetching new servers...")
         fetchNewServers()
+        return
     end
 
-    if #AllIDs > 0 then
-        local ID = table.remove(AllIDs, 1) -- Get the first ID from the list
-        print("Teleporting to server ID: " .. ID)
+    local ID = table.remove(AllIDs, 1) -- Get the first ID from the list
+    print("Attempting to teleport to server ID: " .. ID)
+
+    local success, err = pcall(function()
         game:GetService("TeleportService"):TeleportToPlaceInstance(PlaceID, ID, game.Players.LocalPlayer)
-        wait(3) -- Wait for a short period before the next teleport
+    end)
+
+    if success then
+        recordVisit(ID) -- Record the visit after a successful teleport
+        print("Successfully teleported to server ID: " .. ID)
     else
-        print("No suitable servers found.")
+        print("Failed to teleport to server ID: " .. ID .. ". Error: " .. err)
+        -- If teleportation fails, you might want to keep the ID in the list or handle it differently
     end
+
+    -- Save the updated UsedIDs to the file after attempting to teleport
+    saveData()
 end
 
 -- Start the teleport process
 local function Teleport()
     while wait(1) do -- Reduced wait time to 1 second for more frequent checks
         resetUsedIDsIfHourChanged()
-        pcall(function()
-            TPReturner()
-        end)
+        TPReturner() -- Directly call TPReturner
     end
 end
 
