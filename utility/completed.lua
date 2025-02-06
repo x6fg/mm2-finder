@@ -5,7 +5,7 @@ local lastHour = os.date("!*t").hour
 local foundAnything = ""
 local serverFileName = "Sbaba" .. PlaceID .. ".json"  -- File name based on PlaceID
 
--- Load the previously stored IDs and timestamps
+-- Load the previously stored IDs, timestamps, and lastHour
 local function loadData()
     local success, data = pcall(function()
         return game:GetService('HttpService'):JSONDecode(readfile(serverFileName))
@@ -14,16 +14,17 @@ local function loadData()
     if success then
         AllIDs = data.AllIDs or {}
         UsedIDs = data.UsedIDs or {}
+        lastHour = data.lastHour or lastHour  -- Load lastHour from saved data
         print("Data loaded successfully.")
     else
-        writefile(serverFileName, game:GetService('HttpService'):JSONEncode({AllIDs = {}, UsedIDs = {}}))
+        writefile(serverFileName, game:GetService('HttpService'):JSONEncode({AllIDs = {}, UsedIDs = {}, lastHour = lastHour}))
         print("No data found, created new file.")
     end
 end
 
--- Save the updated IDs and timestamps
+-- Save the updated IDs, timestamps, and lastHour
 local function saveData()
-    writefile(serverFileName, game:GetService('HttpService'):JSONEncode({AllIDs = AllIDs, UsedIDs = UsedIDs}))
+    writefile(serverFileName, game:GetService('HttpService'):JSONEncode({AllIDs = AllIDs, UsedIDs = UsedIDs, lastHour = lastHour}))
     print("Data saved.")
 end
 
@@ -33,7 +34,7 @@ local function resetUsedIDsIfHourChanged()
     if currentHour ~= lastHour then
         UsedIDs = {}
         lastHour = currentHour
-        saveData()
+        saveData()  -- Save the new lastHour
         print("Used IDs reset for the new hour.")
     end
 end
