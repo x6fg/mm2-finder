@@ -3,7 +3,7 @@ local AllIDs = {}
 local UsedIDs = {}
 local lastHour = os.date("!*t").hour
 local foundAnything = ""
-local serverFileName = "Sbaba" .. PlaceID .. ".json"  -- File name based on PlaceID
+local serverFileName = "server" .. PlaceID .. ".json"  -- File name based on PlaceID
 
 -- Load the previously stored IDs, timestamps, and lastHour
 local function loadData()
@@ -36,7 +36,7 @@ local function resetUsedIDsIfHourChanged()
         lastHour = currentHour
         delfile(serverFileName)
         task.wait(1)
-        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
     end
 end
 
