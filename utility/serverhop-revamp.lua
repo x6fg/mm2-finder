@@ -34,8 +34,9 @@ local function resetUsedIDsIfHourChanged()
     if currentHour ~= lastHour then
         UsedIDs = {}
         lastHour = currentHour
-        saveData()  -- Save the new lastHour
-        print("Used IDs reset for the new hour.")
+        delfile(serverFileName)
+        task.wait(1)
+        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
     end
 end
 
