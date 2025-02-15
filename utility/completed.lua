@@ -5,7 +5,7 @@ local lastHour = os.date("!*t").hour
 local foundAnything = ""
 local serverFileName = "testinghopp" .. PlaceID .. ".json"  -- File name based on PlaceID
 
--- Load the previously stored IDs, timestamps, and lastHour
+-- Lsssssur
 local function loadData()
     local success, data = pcall(function()
         return game:GetService('HttpService'):JSONDecode(readfile(serverFileName))
@@ -101,7 +101,7 @@ end
 local function TPReturner()
     if #AllIDs == 0 then
         print("AllIDs is empty, fetching new servers...")
-        fetchNew Servers()
+        fetchNewServers()
         return
     end
 
