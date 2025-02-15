@@ -34,8 +34,8 @@ local function resetUsedIDsIfHourChanged()
     if currentHour ~= lastHour then
         UsedIDs = {}
         lastHour = currentHour
-        saveData()  -- Save the new lastHour
-        game:GetService("TeleportService"):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
+        saveData()
+        task.wait(1)
     end
 end
 
