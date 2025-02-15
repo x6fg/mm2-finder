@@ -34,8 +34,8 @@ local function resetUsedIDsIfHourChanged()
     if currentHour ~= lastHour then
         UsedIDs = {}
         lastHour = currentHour
-        saveData()
-        task.wait(1)
+        saveData()  -- Save the new lastHour
+        print("Used IDs reset for the new hour.")
     end
 end
 
