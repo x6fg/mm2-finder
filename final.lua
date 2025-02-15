@@ -3,7 +3,7 @@ local AllIDs = {}
 local UsedIDs = {}
 local lastHour = os.date("!*t").hour
 local foundAnything = ""
-local serverFileName = "Sbaba" .. PlaceID .. ".json"  -- File name based on PlaceID
+local serverFileName = "testinghopp" .. PlaceID .. ".json"  -- File name based on PlaceID
 
 -- Load the previously stored IDs, timestamps, and lastHour
 local function loadData()
@@ -101,7 +101,7 @@ end
 local function TPReturner()
     if #AllIDs == 0 then
         print("AllIDs is empty, fetching new servers...")
-        fetchNewServers()
+        fetchNew Servers()
         return
     end
 
@@ -117,7 +117,7 @@ local function TPReturner()
         print("Successfully teleported to server ID: " .. ID)
     else
         print("Failed to teleport to server ID: " .. ID .. ". Error: " .. err)
-        -- If teleportation fails, you might want to keep the ID in the list or handle it differently
+        table.insert(AllIDs, ID) -- Keep the ID in the list for future attempts
     end
 
     -- Save the updated UsedIDs to the file after attempting to teleport
