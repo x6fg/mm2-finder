@@ -1,3 +1,4 @@
+local main = {}
 local PlaceID = game.PlaceId
 local AllIDs = {}
 local UsedIDs = {}
@@ -125,13 +126,13 @@ local function TPReturner()
 end
 
 -- Start the teleport process
-local function Teleport()
+function main:Teleport()
     while wait(1) do -- Reduced wait time to 1 second for more frequent checks
         resetUsedIDsIfHourChanged()
         TPReturner() -- Directly call TPReturner
     end
 end
 
--- Load data and initiate teleport process
 loadData()
-Teleport()
+
+return main
