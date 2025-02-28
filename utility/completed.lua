@@ -134,5 +134,5 @@ function main:Teleport()
 end
 
 loadData()
-
+resetUsedIDsIfHourChanged()
 return main
