@@ -124,15 +124,13 @@ local function TPReturner()
     -- Save the updated UsedIDs to the file after attempting to teleport
     saveData()
 end
-
--- Start the teleport process
-function main:Teleport()
-    while wait(1) do -- Reduced wait time to 1 second for more frequent checks
-        resetUsedIDsIfHourChanged()
-        TPReturner() -- Directly call TPReturner
-    end
+resetUsedIDsIfHourChanged()
+function Teleport()
+while wait(1) do -- Reduced wait time to 1 second for more frequent checks
+    resetUsedIDsIfHourChanged()
+    TPReturner() -- Directly call TPReturner
+end
 end
 
 loadData()
-resetUsedIDsIfHourChanged()
-return main
+Teleport()
