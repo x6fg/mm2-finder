@@ -1,4 +1,5 @@
-return nil
+game.Players.LocalPlayer:Kick("Script is now discontinued, thanks for all the support -@keybinds")
+return
 return {
   2884858396, --@h5r0r
   743416428, --@keybinds
